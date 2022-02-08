@@ -17,9 +17,9 @@ class CheckLimit:
     return withinLimit
   
 def battery_is_ok(temperature, soc, charge_rate):
-  temperature_check = CheckLimit(temperature, BMSRange.temperature_range)
-  soc_check = CheckLimit(soc, BMSRange.soc_range)
-  charge_rate_check = CheckLimit(charge_rate, BMSRange.charge_rate_range)
+  temperature_check = CheckLimit(temperature, BMS_range.temperature_range)
+  soc_check = CheckLimit(soc, BMS_range.soc_range)
+  charge_rate_check = CheckLimit(charge_rate, BMS_range.charge_rate_range)
   
   return temperature_check.check_limit() and soc_check.check_limit() and charge_rate_check.check_limit()
 
