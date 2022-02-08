@@ -7,7 +7,7 @@ class CheckLimit:
   
   def check_limit(self):
     withinLimit = False
-    if self.value < self.range.max_limit:
+    if self.value < self.range.min_limit:
       print(self.range.parameter + ' is below minimum limit!')
     elif self.value > self.range.max_limit:
       print(self.range.parameter + ' is exceeding the maximum limit!')
