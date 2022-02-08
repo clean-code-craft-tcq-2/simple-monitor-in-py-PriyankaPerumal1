@@ -27,6 +27,8 @@ def test_battery():
   assert(battery_is_ok(25, 70, 0.7) is True)
   assert(battery_is_ok(50, 85, 0) is False)
   assert(battery_is_ok(20, 60, 0.9) is False)
+  assert(battery_is_ok(20, 60, 0.1) is True)
+  assert(battery_is_ok(1000, 900, 10) is False)
   
 if __name__ == '__main__':
     test_battery()
