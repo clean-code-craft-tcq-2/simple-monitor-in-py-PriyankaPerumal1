@@ -30,11 +30,13 @@ class CheckLimit:
     self.messages = messages[Language]
     
   
-  def get_min_tolerance(self):
-    return self.range.min_limit + ((self.range.max_limit * self.range.tolerance)/100)
+  def check_min_tolerance(self):
+    min_tolerance = self.range.min_limit + ((self.range.max_limit * self.range.tolerance)/100)
+    return self.range.check_early_warning and self.value <= min_tolerance
   
-  def get_max_tolerance(self):
-    return self.range.max_limit - ((self.range.max_limit * self.range.tolerance)/100)
+  def check_max_tolerance(self):
+    max_tolerance = self.range.max_limit - ((self.range.max_limit * self.range.tolerance)/100)
+    return self.range.check_early_warning and self.value >= max_tolerance
 
   def print_alert_message(self, type_of_breach, parameter):
     print(colored(self.messages['Breach']  + ': ' + type_of_breach + ' ' + parameter, 'red'))
@@ -58,9 +60,9 @@ class CheckLimit:
   
   def check_warning(self):
     tolerance_ok = False
-    if self.range.check_early_warning and self.value <= self.get_min_tolerance():
+    if self.check_min_tolerance():
       self.print_warning_message(self.messages['Low'], self.messages[self.range.parameter])
-    elif self.range.check_early_warning and self.value >= self.get_max_tolerance():
+    elif self.check_max_tolerance():
       self.print_warning_message(self.messages['High'], self.messages[self.range.parameter])
     else:
       self.print_normal_message(self.messages[self.range.parameter])
