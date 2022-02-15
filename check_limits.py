@@ -51,19 +51,16 @@ class CheckLimit:
       self.print_alert_message(self.messages['Low'], self.messages[self.range.parameter])
     elif self.value > self.range.max_limit:
       self.print_alert_message(self.messages['High'], self.messages[self.range.parameter])
-    elif self.range.check_early_warning:
-      range_ok = self.check_warning()
     else:
-      self.print_normal_message(self.messages[self.range.parameter])
-      range_ok = True
+      range_ok = self.check_warning()
       
     return range_ok
   
   def check_warning(self):
     tolerance_ok = False
-    if self.value <= self.get_min_tolerance():
+    if self.range.check_early_warning and self.value <= self.get_min_tolerance():
       self.print_warning_message(self.messages['Low'], self.messages[self.range.parameter])
-    elif self.value >= self.get_max_tolerance():
+    elif self.range.check_early_warning and self.value >= self.get_max_tolerance():
       self.print_warning_message(self.messages['High'], self.messages[self.range.parameter])
     else:
       self.print_normal_message(self.messages[self.range.parameter])
