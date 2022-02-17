@@ -30,11 +30,11 @@ class CheckLimit:
     self.messages = messages[Language]
     
   
-  def check_min_tolerance(self):
+  def value_is_in_min_warning_range(self):
     min_tolerance = self.range.min_limit + ((self.range.max_limit * self.range.tolerance)/100)
     return self.range.check_early_warning and self.value <= min_tolerance
   
-  def check_max_tolerance(self):
+  def value_is_in_max_warning_range(self):
     max_tolerance = self.range.max_limit - ((self.range.max_limit * self.range.tolerance)/100)
     return self.range.check_early_warning and self.value >= max_tolerance
 
@@ -47,26 +47,26 @@ class CheckLimit:
   def print_normal_message(self, parameter):
     print(colored(self.messages['Normal']  + ': ' + parameter, 'green'))
 
-  def check_limit(self):
+  def range_is_ok(self):
     range_ok = False
     if self.value < self.range.min_limit:
       self.print_alert_message(self.messages['Low'], self.messages[self.range.parameter])
     elif self.value > self.range.max_limit:
       self.print_alert_message(self.messages['High'], self.messages[self.range.parameter])
     else:
-      range_ok = self.check_warning()
+      range_ok = not self.value_is_in_warning_range()
       
     return range_ok
   
-  def check_warning(self):
-    tolerance_ok = False
-    if self.check_min_tolerance():
+  def value_is_in_warning_range(self):
+    tolerance_ok = True
+    if self.value_is_in_min_warning_range():
       self.print_warning_message(self.messages['Low'], self.messages[self.range.parameter])
-    elif self.check_max_tolerance():
+    elif self.value_is_in_max_warning_range():
       self.print_warning_message(self.messages['High'], self.messages[self.range.parameter])
     else:
       self.print_normal_message(self.messages[self.range.parameter])
-      tolerance_ok = True
+      tolerance_ok = False
 
     return tolerance_ok
 
@@ -74,7 +74,7 @@ class CheckLimit:
 def battery_is_ok(battery_values, Language):
   within_range = True
   for parameter in battery_values:
-      if not CheckLimit(battery_values[parameter], BMS_range.bms_range_dict[parameter], Language).check_limit():
+      if not CheckLimit(battery_values[parameter], BMS_range.bms_range_dict[parameter], Language).range_is_ok():
         within_range = False
 
   return within_range
@@ -92,8 +92,19 @@ def test_battery():
   assert(battery_is_ok({"Temperature": 0,"State of Charge": 20,"Charge Rate": 0 }, 'EN') is False)
   assert(battery_is_ok({"Temperature": 45,"State of Charge": 80,"Charge Rate": 0.81 }, 'EN') is False)
   assert(battery_is_ok({"Temperature": 45,"State of Charge": 81,"Charge Rate": 0.80 }, 'EN') is False)
+  assert(CheckLimit(43, BMS_range.bms_range_dict["Temperature"], 'EN').value_is_in_warning_range() is True)
+  assert(CheckLimit(2, BMS_range.bms_range_dict["Temperature"], 'DE').value_is_in_warning_range() is True)
+  assert(CheckLimit(2.8, BMS_range.bms_range_dict["Temperature"], 'EN').value_is_in_warning_range() is False)
+  assert(CheckLimit(42.71, BMS_range.bms_range_dict["Temperature"], 'EN').value_is_in_warning_range() is False)
+  assert(CheckLimit(24, BMS_range.bms_range_dict["State of Charge"], 'EN').value_is_in_warning_range() is True)
+  assert(CheckLimit(76, BMS_range.bms_range_dict["State of Charge"], 'EN').value_is_in_warning_range() is True)
+  assert(CheckLimit(25, BMS_range.bms_range_dict["State of Charge"], 'EN').value_is_in_warning_range() is False)
+  assert(CheckLimit(75, BMS_range.bms_range_dict["State of Charge"], 'EN').value_is_in_warning_range() is False)
+  assert(CheckLimit(0.04, BMS_range.bms_range_dict["Charge Rate"], 'EN').value_is_in_warning_range() is True)
+  assert(CheckLimit(0.76, BMS_range.bms_range_dict["Charge Rate"], 'EN').value_is_in_warning_range() is True)
+  assert(CheckLimit(0.75, BMS_range.bms_range_dict["Charge Rate"], 'EN').value_is_in_warning_range() is False)
+  assert(CheckLimit(0.05, BMS_range.bms_range_dict["Charge Rate"], 'EN').value_is_in_warning_range() is False)
 
-  
 if __name__ == '__main__':
     test_battery()
 
