@@ -79,7 +79,7 @@ def battery_is_ok(battery_values, Language):
 
   return within_range
 
-def test_battery():
+def test_battery_is_ok():
   assert(battery_is_ok({"Temperature": 25,"State of Charge": 70,"Charge Rate": 0.7 }, 'EN') is True)
   assert(battery_is_ok({"Temperature": 50,"State of Charge": 85,"Charge Rate": 0 }, 'DE') is False)
   assert(battery_is_ok({"Temperature": 20,"State of Charge": 60,"Charge Rate": 0.9 }, 'EN') is False)
@@ -92,6 +92,20 @@ def test_battery():
   assert(battery_is_ok({"Temperature": 0,"State of Charge": 20,"Charge Rate": 0 }, 'EN') is False)
   assert(battery_is_ok({"Temperature": 45,"State of Charge": 80,"Charge Rate": 0.81 }, 'EN') is False)
   assert(battery_is_ok({"Temperature": 45,"State of Charge": 81,"Charge Rate": 0.80 }, 'EN') is False)
+
+  assert(CheckLimit(41, BMS_range.bms_range_dict["Temperature"], 'EN').range_is_ok() is True)
+  assert(CheckLimit(3, BMS_range.bms_range_dict["Temperature"], 'DE').range_is_ok() is True)
+  assert(CheckLimit(46, BMS_range.bms_range_dict["Temperature"], 'EN').range_is_ok() is False)
+  assert(CheckLimit(0, BMS_range.bms_range_dict["Temperature"], 'EN').range_is_ok() is False)
+  assert(CheckLimit(25, BMS_range.bms_range_dict["State of Charge"], 'EN').range_is_ok() is True)
+  assert(CheckLimit(75, BMS_range.bms_range_dict["State of Charge"], 'EN').range_is_ok() is True)
+  assert(CheckLimit(15, BMS_range.bms_range_dict["State of Charge"], 'EN').range_is_ok() is False)
+  assert(CheckLimit(81, BMS_range.bms_range_dict["State of Charge"], 'EN').range_is_ok() is False)
+  assert(CheckLimit(0.5, BMS_range.bms_range_dict["Charge Rate"], 'EN').range_is_ok() is True)
+  assert(CheckLimit(0.7, BMS_range.bms_range_dict["Charge Rate"], 'EN').range_is_ok() is True)
+  assert(CheckLimit(0, BMS_range.bms_range_dict["Charge Rate"], 'EN').range_is_ok() is False)
+  assert(CheckLimit(1, BMS_range.bms_range_dict["Charge Rate"], 'EN').range_is_ok() is False)
+
   assert(CheckLimit(43, BMS_range.bms_range_dict["Temperature"], 'EN').value_is_in_warning_range() is True)
   assert(CheckLimit(2, BMS_range.bms_range_dict["Temperature"], 'DE').value_is_in_warning_range() is True)
   assert(CheckLimit(2.8, BMS_range.bms_range_dict["Temperature"], 'EN').value_is_in_warning_range() is False)
@@ -106,5 +120,5 @@ def test_battery():
   assert(CheckLimit(0.05, BMS_range.bms_range_dict["Charge Rate"], 'EN').value_is_in_warning_range() is False)
 
 if __name__ == '__main__':
-    test_battery()
+    test_battery_is_ok()
 
